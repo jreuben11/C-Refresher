@@ -2,5 +2,10 @@ cmake_minimum_required(VERSION 3.10)
 project(language_features)
 
 set(CMAKE_CXX_STANDARD 17)
-
-add_executable(language_features main.cpp)
+if (APPLE)
+    add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
+    add_definitions(-D__GLIBCXX__)
+endif (APPLE)
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+add_executable(language_features main.cpp cpp_sorter.h cpp_sorter_test.cpp)
+target_link_libraries(language_features gtest gtest_main)
