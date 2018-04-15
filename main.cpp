@@ -6,7 +6,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Stopwatch.h"
 
-// #include <boost/regex.hpp>
+//#include <boost/regex.hpp>
 #include <string>
 #include <iostream>
 
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     Thread::sleep(3000);
     timer.stop();
 
-    std::string s = "correct@email.com", s2="bademail";
+//    std::string s = "correct@email.com", s2="bademail";
 //    boost::regex expr{"\\b[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}\\b"};
 //    std::cout << std::boolalpha << boost::regex_match(s, expr) << '\n';
 //    std::cout << std::boolalpha << boost::regex_match(s2, expr) << '\n';
