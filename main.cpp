@@ -8,23 +8,12 @@
 
 #include <boost/regex.hpp>
 #include <string>
-#include <iostream>
+#include "TimerExample.h"
 
 using Poco::Timer;
 using Poco::TimerCallback;
 using Poco::Thread;
 using Poco::Stopwatch;
-
-class TimerExample{
-public:
-    TimerExample(){ _sw.start();}
-
-    void onTimer(Timer& timer){
-        std::cout << "Callback called after " << _sw.elapsed()/1000 << " milliseconds." << std::endl;
-    }
-private:
-    Stopwatch _sw;
-};
 
 int main(int argc, char **argv) {
     int a[] = {1,2,3,4};
