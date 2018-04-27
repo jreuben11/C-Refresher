@@ -4,6 +4,7 @@
 
 #include <initializer_list>
 #include <list>
+#include <vector>
 #include <algorithm>
 #include <iostream>
 #include "userdefinedtypes.h"
@@ -111,6 +112,7 @@ namespace concretetypes {
 
     }
 }
+
 namespace abstracttypes { // without generics
     class Container {
     public:
@@ -152,8 +154,7 @@ namespace abstracttypes { // without generics
         int size() const { return ld.size(); }
     };
 
-    double& List_container::operator[](int i)
-    {
+    double& List_container::operator[](int i) {
         for (auto& x : ld) { // interesting: iterate through list, decrementing counter until ith item
             if (i==0) return x;
             --i;
@@ -167,3 +168,137 @@ namespace abstracttypes { // without generics
     }
 
 }
+
+namespace classhierarchies {
+    struct Point {
+        int x,y;
+        Point(int x, int y): x{x}, y{y} {}
+    };
+
+    class Shape {
+    public:
+        virtual Point center() const =0;     // pure virtual
+        virtual void move(Point to) =0;
+
+        virtual void draw() const = 0;       // draw on current "Canvas"
+        virtual void rotate(int angle) = 0;  // rotate v's elements by angle degrees
+
+        virtual ~Shape() {}                 // virtual destructor - critical for base
+        // ...
+    };
+
+
+    class Circle : public Shape {
+    public:
+        Circle(Point p, int rr): x{p}, r{rr} {}
+
+        Point center() const { return x; }
+        void move(Point to) { x=to; }
+
+        void draw() const {}
+        void rotate(int) {}              // nice simple algorithm
+    private:
+        Point x;  // center
+        int r;    // radius
+    };
+
+
+    class Smiley : public Circle { // use the circle as the base for a face
+    public:
+        Smiley(Point p, int r) : Circle{p,r}, mouth{nullptr} { }
+
+        ~Smiley() {
+            delete mouth;
+            for (auto p : eyes) delete p; // dtor technique: delete contents of RAII container
+        }
+        void move(Point to);
+
+        void draw() const;
+        void rotate(int);
+
+        void add_eye(Shape* s) { eyes.push_back(s); }
+        void set_mouth(Shape* s) {}
+        virtual void wink(int i);    // wink eye number i
+
+        // ...
+
+    private:
+        std::vector<Shape*> eyes;         // usually two eyes. RAII
+        Shape* mouth;
+    };
+
+    void Smiley::draw() const {
+        Circle::draw();
+        for (auto p : eyes)
+            p->draw();
+        mouth->draw();
+    }
+
+    void Smiley::move(Point to) {
+        Circle::move(to);
+    }
+
+    void Smiley::rotate(int r) {
+        Circle::rotate(r);
+    }
+
+    void Smiley::wink(int i) {
+
+    }
+
+    enum class Kind { circle, triangle, smiley };
+
+    // bad: Shape* read_shape(std::istream& is)
+    std::unique_ptr<Shape> read_shape(std::istream& is)       // read shape descriptions from input stream is
+    {
+
+        // ... read shape header from is and find its Kind k ...
+        Kind k = Kind::smiley;
+        Point p {1,1};
+        int r =1;
+//        Shape* x = new Circle{p,r};
+//        return x;
+        switch (k) {
+            case Kind::circle:
+                // read circle data {Point,int} into p and r
+                // BAD: return new Circle{p,r};
+                return std::unique_ptr<Shape>{new Circle{p,r}};
+            case Kind::triangle:
+                // read triangle data {Point,Point,Point} into p1, p2, and p3
+                return nullptr; // new Triangle{p1,p2,p3};
+            case Kind::smiley:
+                // read smiley data {Point,int,Shape,Shape,Shape} into p, r, e1 ,e2, and m
+                // BAD: Smiley* ps = new Smiley{p,r};
+                std::unique_ptr<Shape> ps = std::unique_ptr<Smiley>{new Smiley{p, r}};
+                Shape* e1 = new Circle{p,r};
+                Shape* e2 = new Circle{p,r};
+                Shape* m = nullptr;
+                // TODO: unique_ptr and polymorphism
+//                ps->add_eye(e1);
+//                ps->add_eye(e2);
+//                ps->set_mouth(m);
+                return ps;
+        }
+    }
+
+    void draw_all(std::vector<Shape*>& v) {
+        for (auto& p : v)
+            p->draw();
+    }
+    void rotate_all(std::vector<std::unique_ptr<Shape>> v, int angle) {
+        for (auto& p : v)
+            p->rotate(angle);
+    }
+
+    void user() {
+        // BAD: std::vector<Shape*>v;
+        std::vector<std::unique_ptr<Shape>> v;
+        while (std::cin)
+            v.push_back(read_shape(std::cin));
+        // draw_all(v);                // call draw() for each element
+        // rotate_all(v,45);           // call rotate(45) for each element
+        // DONT NEED THIS ANYMORE: for (auto& p : v) delete p;  // remember to delete elements
+    }
+}
+
+namespace copyandmove {}
