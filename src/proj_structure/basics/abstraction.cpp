@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <complex>
 #include "userdefinedtypes.h"
 
 namespace concretetypes {
@@ -183,6 +184,11 @@ namespace classhierarchies {
         virtual void draw() const = 0;       // draw on current "Canvas"
         virtual void rotate(int angle) = 0;  // rotate v's elements by angle degrees
 
+        Shape(const Shape&) =delete;             // no copy operations
+        Shape& operator=(const Shape&) =delete;
+        Shape(Shape&&) =delete;                  // no move operations
+        Shape& operator=(Shape&&) =delete;
+        Shape(){}                           // necessitated by deletion of copy ctor ?
         virtual ~Shape() {}                 // virtual destructor - critical for base
         // ...
     };
@@ -301,4 +307,30 @@ namespace classhierarchies {
     }
 }
 
-namespace copyandmove {}
+namespace copyandmove {
+    using std::complex;
+    void copytest(complex<double> z1) {
+        complex<double> z2 {z1};   // copy initialization
+        complex<double> z3;
+        z3 = z2;           // copy assignment
+    }
+
+    void copytest(classes::Vector v1) {
+        classes::Vector v2 = v1;    // copy v1's representation into v2
+        v1[0] = 2;
+        v2[1] = 3;
+    }
+
+    classes::Vector movetest() {
+        classes::Vector x(1000);
+        classes::Vector y(1000);
+        classes::Vector z(1000);
+        // ...
+        z = x;             // we get a copy
+        y = std::move(x);  // we get a move
+        // ...
+        return z;          // we get a move
+    };
+
+
+}

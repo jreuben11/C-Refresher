@@ -53,6 +53,41 @@ namespace classes {
 
     unsigned int Vector::size() const { return sz; }
 
+    Vector::Vector(const Vector& a)      // copy constructor
+            :sz{a.sz},           // allocate space for elements
+             elem{new double[sz]}
+    {
+        for (int i=0; i!=sz; ++i)        // copy elements
+            elem[i] = a.elem[i];
+    }
+
+    Vector& Vector::operator=(const Vector& a)   // copy assignment
+    {
+        double* p = new double[a.sz]; // create a 'replacement' array
+        for (int i=0; i!=a.sz; ++i)
+            p[i] = a.elem[i];
+        delete[] elem;         // delete old elements
+        elem = p;		// assign new elements
+        sz = a.sz;
+        return *this;
+    }
+
+    Vector::Vector(Vector&& a)  // move ctor
+            :elem{a.elem},      // "grab the elements" from a
+             sz{a.sz}
+    {
+        a.elem = nullptr;         // now a has no elements
+        a.sz = 0;
+    }
+
+    Vector &Vector::operator=(Vector &&a) {
+        this->elem = {a.elem};
+        this->sz = {a.sz};
+        a.elem = nullptr;
+        a.sz = 0;
+        return *this;
+    }
+
     double read_and_sum(int s){
         Vector v(s);                     // make a vector of s elements
         for (int i=0; i!=v.size(); ++i)
