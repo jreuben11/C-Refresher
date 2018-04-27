@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include "userdefinedtypes.h"
 
 namespace structs {
 
@@ -37,17 +38,12 @@ namespace structs {
 }
 
 namespace classes {
-    class Vector { // handle
-    public:
-        Vector(int s);
-        double& operator[](int i);
-        int size();
-    private:
-        double* elem; // pointer to the elements
-        int sz;       // the number of elements
-    };
 
-    Vector::Vector(int s) :elem{new double[s]}, sz{s} { }  // - note: init lists
+    Vector::Vector(unsigned int s) :elem{new double[s]}, sz{s} {  // - note: init lists
+        for (int i=0; i!=s; ++i) elem[i]=0;           // initialize elements
+    }
+
+    Vector::~Vector() { delete[] elem; } // destructor: release resources
 
     double &Vector::operator[](int i)  // - note: operator returns ref
     {
@@ -55,7 +51,7 @@ namespace classes {
         return elem[i]; // element access operator: subscripting
     }
 
-    int Vector::size() { return sz; }
+    unsigned int Vector::size() const { return sz; }
 
     double read_and_sum(int s){
         Vector v(s);                     // make a vector of s elements
@@ -72,7 +68,7 @@ namespace classes {
         try {
 
             v[v.size()] = 7; // try to access beyond the end of v
-        } catch (std::out_of_range) {
+        } catch (std::out_of_range&) {
             // ... handle range error ...
         }
         // ...
