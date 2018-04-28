@@ -254,8 +254,9 @@ namespace classhierarchies {
 
     enum class Kind { circle, triangle, smiley };
 
-    // bad: Shape* read_shape(std::istream& is)
-    std::unique_ptr<Shape> read_shape(std::istream& is)       // read shape descriptions from input stream is
+
+
+    Shape* read_shape(std::istream& is)      // read shape descriptions from input stream is
     {
 
         // ... read shape header from is and find its Kind k ...
@@ -267,22 +268,19 @@ namespace classhierarchies {
         switch (k) {
             case Kind::circle:
                 // read circle data {Point,int} into p and r
-                // BAD: return new Circle{p,r};
-                return std::unique_ptr<Shape>{new Circle{p,r}};
+                return new Circle{p,r};
             case Kind::triangle:
                 // read triangle data {Point,Point,Point} into p1, p2, and p3
                 return nullptr; // new Triangle{p1,p2,p3};
             case Kind::smiley:
                 // read smiley data {Point,int,Shape,Shape,Shape} into p, r, e1 ,e2, and m
-                // BAD: Smiley* ps = new Smiley{p,r};
-                std::unique_ptr<Shape> ps = std::unique_ptr<Smiley>{new Smiley{p, r}};
+                Smiley* ps = new Smiley{p,r};
                 Shape* e1 = new Circle{p,r};
                 Shape* e2 = new Circle{p,r};
                 Shape* m = nullptr;
-                // TODO: unique_ptr and polymorphism
-//                ps->add_eye(e1);
-//                ps->add_eye(e2);
-//                ps->set_mouth(m);
+                ps->add_eye(e1);
+                ps->add_eye(e2);
+                ps->set_mouth(m);
                 return ps;
         }
     }
@@ -291,27 +289,71 @@ namespace classhierarchies {
         for (auto& p : v)
             p->draw();
     }
-    void rotate_all(std::vector<std::unique_ptr<Shape>> v, int angle) {
+    void rotate_all(std::vector<Shape*>& v, int angle) {
         for (auto& p : v)
             p->rotate(angle);
     }
 
     void user() {
-        // BAD: std::vector<Shape*>v;
-        std::vector<std::unique_ptr<Shape>> v;
+        std::vector<Shape*>v;
+//        std::vector<std::unique_ptr<Shape>> v;
         while (std::cin)
             v.push_back(read_shape(std::cin));
-        // draw_all(v);                // call draw() for each element
-        // rotate_all(v,45);           // call rotate(45) for each element
-        // DONT NEED THIS ANYMORE: for (auto& p : v) delete p;  // remember to delete elements
+        draw_all(v);                // call draw() for each element
+        rotate_all(v,45);           // call rotate(45) for each element
+        for (auto& p : v) delete p;  // remember to delete elements
     }
+
+    template<class C, class Oper>
+    void for_all(C& c, Oper op)       // assume that C is a container of pointers - without concepts / ranges could really blow up!
+    {
+        for (auto& x : c)
+            op(*x);     // pass op() a reference to each element pointed to
+    }
+
+    std::unique_ptr<Shape> read_shape2(std::istream& is)       // read shape descriptions from input stream is
+    {
+
+        // ... read shape header from is and find its Kind k ...
+        Kind k = Kind::smiley;
+        Point p {1,1};
+        int r =1;
+        switch (k) {
+            case Kind::circle:
+                // read circle data {Point,int} into p and r
+                return std::unique_ptr<Shape>{new Circle{p,r}};
+            case Kind::triangle:
+                // read triangle data {Point,Point,Point} into p1, p2, and p3
+                return nullptr; // new Triangle{p1,p2,p3};
+            case Kind::smiley:
+                // read smiley data {Point,int,Shape,Shape,Shape} into p, r, e1 ,e2, and m
+                std::unique_ptr<Shape> ps = std::unique_ptr<Smiley>{new Smiley{p, r}};
+                Shape* e1 = new Circle{p,r};
+                Shape* e2 = new Circle{p,r};
+                Shape* m = nullptr;
+                // TODO: unique_ptr and polymorphism ?
+//                ps->add_eye(e1);
+//                ps->add_eye(e2);
+//                ps->set_mouth(m);
+                return ps;
+        }
+    }
+    void user2()
+    {
+        std::vector<std::unique_ptr<Shape>> v;
+        while (std::cin)
+            v.push_back(read_shape2(std::cin));
+        for_all(v, [](Shape& s){ s.draw(); });      // lambda equivelent of draw_all()
+        for_all(v, [](Shape& s){ s.rotate(45); });  // lambda equivelent of  rotate_all(45)
+    }
+
+
 }
 
 namespace copyandmove {
-    using std::complex;
-    void copytest(complex<double> z1) {
-        complex<double> z2 {z1};   // copy initialization
-        complex<double> z3;
+    void copytest(std::complex<int> z1) {
+        std::complex<int> z2 {z1};   // copy initialization
+        std::complex<int> z3;
         z3 = z2;           // copy assignment
     }
 

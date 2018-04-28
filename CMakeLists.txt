@@ -16,7 +16,7 @@ endif()
 conan_basic_setup()
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-add_executable(${PROJECT_NAME} main.cpp TimerExample.cpp include/cpp_sorter.h test/cpp_sorter_test.cpp src/proj_structure/linkage/file1.cpp src/proj_structure/linkage/file2.cpp src/proj_structure/linkage/file0.h src/proj_structure/linkage/file3.cpp src/proj_structure/basics/types.cpp src/proj_structure/basics/userdefinedtypes.cpp src/proj_structure/basics/abstraction.cpp  src/proj_structure/basics/userdefinedtypes.h)
+add_executable(${PROJECT_NAME} main.cpp TimerExample.cpp include/cpp_sorter.h test/cpp_sorter_test.cpp src/proj_structure/linkage/file1.cpp src/proj_structure/linkage/file2.cpp src/proj_structure/linkage/file0.h src/proj_structure/linkage/file3.cpp src/proj_structure/basics/types.cpp src/proj_structure/basics/userdefinedtypes.cpp src/proj_structure/basics/abstraction.cpp  src/proj_structure/basics/userdefinedtypes.h src/proj_structure/basics/templates.cpp)
 
 target_link_libraries(${PROJECT_NAME} gtest gtest_main)
 target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
