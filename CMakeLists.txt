@@ -8,11 +8,13 @@ if (APPLE)
 #    add_definitions(-D__GLIBCXX__)
 endif (APPLE)
 
+message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 if(EXISTS ${CMAKE_SOURCE_DIR}/.conan/conanbuildinfo.cmake)
     include(${CMAKE_SOURCE_DIR}/.conan/conanbuildinfo.cmake)
 else()
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 endif()
+
 conan_basic_setup()
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
@@ -22,7 +24,7 @@ target_link_libraries(${PROJECT_NAME} gtest gtest_main)
 target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
 
 #Set(BOOST_ROOT /usr/local/Cellar/boost/1.66.0)
-find_package(Boost 1.66.0 REQUIRED COMPONENTS system filesystem regex)
+find_package(Boost 1.67.0 REQUIRED COMPONENTS system filesystem regex)
 
 #Set(BOOST_ROOT /Users/joshreuben/.conan/data/Boost/1.64.0/conan/stable/package/3ab6cde607dc70d7668599938a90459fece3b7cd/1.66.0)
 #SET(BOOST_INCLUDEDIR /Users/joshreuben/.conan/data/Boost/1.64.0/conan/stable/package/3ab6cde607dc70d7668599938a90459fece3b7cd/include)
